@@ -270,7 +270,7 @@ $chain = '[
   },
   {
     "doOn": "200",
-    "href": "$body._links.fx:default_store.href",
+    "href": "${body._links.fx:default_store.href}",
     "method": "get",
     "data": {},
     "return": ["_links.fx:carts.href"]

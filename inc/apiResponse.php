@@ -41,6 +41,7 @@ class apiResponse {
 
 	
 	function retrieveData($property) {
+        $property = str_replace(array('{','}'), '', $property);
 		$parts = explode('.', $property);
 		$resp = $this->response;
 
