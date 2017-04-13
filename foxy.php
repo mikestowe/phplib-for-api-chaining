@@ -282,8 +282,13 @@ $chain = '[
 
 
 // Run Chain :)
+echo '<h1>FoxyCart Test</h1>';
+echo '<b>Chain Sent:</b><br /><tt>'.$chain.'</tt><br /><br /><b>Response:</b><br /><tt>';
+
 
 $chain = new apiChain\apiChain($chain, 'myCalls');
 echo $chain->getOutput();
+
+echo '</tt>';
 
 ?>
