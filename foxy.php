@@ -242,7 +242,13 @@ function myCalls($resource, $headers, $body) {
   "offset": 0
 }'));
 		
-	}
+	} else {
+        return array(
+            'status' => 500,
+            'headers' => array(),
+            'body' => ''
+        );
+    }
 }
 
 
