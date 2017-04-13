@@ -32,13 +32,14 @@ class apiChain {
 	private function validateLink($link) {
 		$response = end($this->responses);
 
+        // Replace Placeholders
         if (preg_match('/(\$[a-z:_]+(\[[0-9]+\])?)(\.[a-z:_]+(\[[0-9]+\])?)*/i', $link->href, $match)) {
 				$link->href = str_replace($match[0], $response->retrieveData(substr($match[0],1)), $link->href);
 			}
 		
 		if ($link->doOn != 'always' && !empty(trim($link->doOn))) {
 			// Replace Placeholders
-			if (preg_match('/(\$[a-z]+(\[[0-9]+\])?)(\.[a-z]+(\[[0-9]+\])?)*/i', $link->doOn, $match)) {
+			if (preg_match('/(\$[a-z:_]+(\[[0-9]+\])?)(\.[a-z:_]+(\[[0-9]+\])?)*/i', $link->doOn, $match)) {
 				$link->doOn = str_replace($match[0], '"'.$response->retrieveData(substr($match[0],1)).'"', $link->doOn);
 			}
 			
@@ -68,7 +69,7 @@ class apiChain {
 		
 		// Replace Placeholders
 		foreach ($link->data as $k => $v) {
-			if (preg_match('/(\$[a-z]+(\[[0-9]+\])?)(\.[a-z]+(\[[0-9]+\])?)*/i', $v, $match)) {
+			if (preg_match('/(\$[a-z:_]+(\[[0-9]+\])?)(\.[a-z:_]+(\[[0-9]+\])?)*/i', $v, $match)) {
 				$link->data->$k = str_replace($match[0], $response->retrieveData(substr($match[0],1)), $v);
 			}
 		}
