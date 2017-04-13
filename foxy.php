@@ -7,7 +7,7 @@ require_once('inc/apiResponse.php');
 // Setup Routing Handler for Requests
 function myCalls($resource, $headers, $body) {
     $resource = str_replace('https://api.foxycart.com', '', $resource);
-	if ($resource == '/users') {
+	if ($resource == '/users/1') {
 		return array(
 			'status' => 200,
 			'headers' => array(),
@@ -263,7 +263,7 @@ function myCalls($resource, $headers, $body) {
 $chain = '[
   {
     "doOn": "always",
-    "href": "/users",
+    "href": "/users/1",
     "method": "get",
     "data": {},
     "return": ["_links.fx:default_store.href"]
@@ -288,7 +288,8 @@ $chain = '[
 
 
 // Run Chain :)
-echo '<h1>FoxyCart Test</h1>';
+echo '<h1 style="margin-bottom: 5px;">FoxyCart Test</h1>';
+echo '<em>Objective: get user 1\'s default store carts.</em><br /><br /><br />';
 echo '<b>Chain Sent:</b><br /><tt>'.$chain.'</tt><br /><br /><br /><b>Response:</b><br /><tt>';
 
 
@@ -297,7 +298,7 @@ echo $chain->getOutput();
 
 echo '</tt><br /><br /><br /><b>Traditional Response (3 separate calls):</b><br /><tt>';
 
-echo json_encode(myCalls('/users', array(), array())['body']);
+echo json_encode(myCalls('/users/1', array(), array())['body']);
 echo '<br /><br />';
 echo json_encode(myCalls('/stores/66', array(), array())['body']);
 echo '<br /><br />';
