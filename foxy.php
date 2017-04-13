@@ -283,12 +283,17 @@ $chain = '[
 
 // Run Chain :)
 echo '<h1>FoxyCart Test</h1>';
-echo '<b>Chain Sent:</b><br /><tt>'.$chain.'</tt><br /><br /><b>Response:</b><br /><tt>';
+echo '<b>Chain Sent:</b><br /><tt>'.$chain.'</tt><br /><br /><br /><b>Response:</b><br /><tt>';
 
 
 $chain = new apiChain\apiChain($chain, 'myCalls');
 echo $chain->getOutput();
 
-echo '</tt>';
+echo '</tt><br /><br /><br /><b>Traditional Response (3 separate calls):</b><br /><tt>';
 
+echo json_encode(myCalls('/users', array(), array())['body']);
+echo '<br /><br />';
+echo json_encode(myCalls('/stores/66', array(), array())['body']);
+echo '<br /><br />';
+echo json_encode(myCalls('/stores/2/carts', array(), array())['body']);
 ?>
