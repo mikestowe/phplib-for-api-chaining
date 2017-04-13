@@ -23,7 +23,7 @@ class apiResponse {
 				$this->assignArrayByPath($body, $v, $tmpValue);
 			}
 			//@todo iterate for casting once arrays are available (album[0], album[1], etc);
-			$this->response->body = (object) $body;
+			$this->response->body = json_decode(json_encode($body));
 		}
 	}
 	
