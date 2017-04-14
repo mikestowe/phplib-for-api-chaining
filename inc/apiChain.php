@@ -31,13 +31,14 @@ class apiChain {
 	
 	private function validateLink($link) {
 		$response = end($this->responses);
+        $link->doOn = trim($link->doOn);
 
         // Replace Placeholders
         if (preg_match('/(\${?[a-z:_]+(\[[0-9]+\])?)(\.[a-z:_]+(\[[0-9]+\])?)*}?/i', $link->href, $match)) {
 				$link->href = str_replace($match[0], $response->retrieveData(substr($match[0],1)), $link->href);
 			}
 		
-		if ($link->doOn != 'always' && !empty(trim($link->doOn))) {
+		if ($link->doOn != 'always' && !empty($link->doOn)) {
 			// Replace Placeholders
 			if (preg_match('/(\${?[a-z:_]+(\[[0-9]+\])?)(\.[a-z:_]+(\[[0-9]+\])?)*}?/i', $link->doOn, $match)) {
 				$link->doOn = str_replace($match[0], '"'.$response->retrieveData(substr($match[0],1)).'"', $link->doOn);

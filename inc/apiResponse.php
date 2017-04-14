@@ -51,6 +51,9 @@ class apiResponse {
 				$part = str_replace($match, '', $part);
 			}
 			
+            if (!isset($resp->$part)) {
+                return null;
+            }
 			$resp = $resp->$part;
 
 			if ($match) {
