@@ -4,15 +4,17 @@ namespace apiChain;
 class apiChain {
 	private $handler;
 	private $chain;
+	private $parentData = false;
 	public $callsRequested = 0;
 	public $callsCompleted = 0;
 	private $headers = array();
 	public $responses = array();
 	
-	function __construct($chain, $handler = false) {
+	function __construct($chain, $handler = false, $lastResponse = false) {
 		$this->chain = json_decode($chain);
 		$this->handler = $handler;
 		$this->headers = getallheaders();
+		$this->responses[] = $lastResponse;
 		
 		$this->callsRequested = count($this->chain);
 		
@@ -20,8 +22,20 @@ class apiChain {
 			if (is_array($link)) {
 				// Handle Nested Chains
 				//@todo test functionality
-				$newChain = new apiChain(json_encode($link), $handler);
-				$this->responses[] = $newChain->getOutput();
+				$this->callsRequested--;
+				
+				if (!$this->parentData) {
+					$lastResponse = array_pop($this->responses);
+					$this->parentData = $lastResponse;
+					$this->responses[] = $lastResponse;
+					
+				} else {
+					$lastResponse = $this->parentData;
+				}
+				
+				$newChain = new apiChain(json_encode($link), $handler, $lastResponse);
+				$this->responses[] = $newChain->getRawOutput();
+				
 			} elseif (!$this->validateLink($link)) {
 				// End Chain and Return
 				return $this;
@@ -107,7 +121,17 @@ class apiChain {
 		);
 	}
 	
+	public function getCallPer() {
+		return $this->callsCompleted / $this->callsRequested;
+	}
+	
 	public function getOutput() {
+		array_shift($this->responses);
 		return json_encode($this);
+	}
+	
+	public function getRawOutput() {
+		array_shift($this->responses);
+		return $this;
 	}
 }
