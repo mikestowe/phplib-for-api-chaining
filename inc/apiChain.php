@@ -8,13 +8,15 @@ class apiChain {
 	public $callsRequested = 0;
 	public $callsCompleted = 0;
 	private $headers = array();
+	private $globals;
 	public $responses = array();
 	
-	function __construct($chain, $handler = false, $lastResponse = false) {
+	function __construct($chain, $handler = false, $lastResponse = false, $globals = array()) {
 		$this->chain = json_decode($chain);
 		$this->handler = $handler;
 		$this->headers = getallheaders();
 		$this->responses[] = $lastResponse;
+		$this->globals = $globals;
 		
 		$this->callsRequested = count($this->chain);
 		
@@ -33,8 +35,8 @@ class apiChain {
 					$lastResponse = $this->parentData;
 				}
 				
-				$newChain = new apiChain(json_encode($link), $handler, $lastResponse);
-				$this->responses[] = $newChain->getRawOutput();
+				$newChain = new apiChain(json_encode($link), $handler, $lastResponse, $this->globals);
+				$this->responses[] = array($newChain->getRawOutput());
 				
 			} elseif (!$this->validateLink($link)) {
 				// End Chain and Return
@@ -47,6 +49,11 @@ class apiChain {
 		$response = end($this->responses);
         $link->doOn = trim($link->doOn);
 
+		// Replace Globals
+		if (preg_match('/\${?global\.([a-z0-9_\.]+)}?/i', $link->href, $match)) {
+			$link->href = str_replace($match[0], $this->globals[$match[1]], $link->href);
+		} 
+		
         // Replace Placeholders
         if (preg_match('/(\${?[a-z:_]+(\[[0-9]+\])?)(\.[a-z:_]+(\[[0-9]+\])?)*}?/i', $link->href, $match)) {
 				$link->href = str_replace($match[0], $response->retrieveData(substr($match[0],1)), $link->href);
@@ -87,10 +94,22 @@ class apiChain {
 			if (preg_match('/(\${?[a-z:_]+(\[[0-9]+\])?)(\.[a-z:_]+(\[[0-9]+\])?)*}?/i', $v, $match)) {
 				$link->data->$k = str_replace($match[0], $response->retrieveData(substr($match[0],1)), $v);
 			}
+			
+			// Globals
+			if (preg_match('/\${?global\.([a-z0-9_\.]+)}?/i', $v, $match)) {
+				$link->data->$k = str_replace($match[0], $this->globals[$match[2]], $link->data);
+			}
 		}
 		
 		$data = $this->handler($link->href, $link->method, $link->data);
-		$this->responses[] = new apiResponse($link->href, $link->method, $data['status'], $data['headers'], $data['body'], $link->return);
+		
+		$this->responses[] = $newResp = new apiResponse($link->href, $link->method, $data['status'], $data['headers'], $data['body'], $link->return);
+		
+		if (isset($link->globals)) {
+			foreach ($link->globals as $k => $v) {
+				$this->globals[$k] = $newResp->retrieveData($v);
+			}
+		}
 		
 		$this->callsCompleted++;
 		
